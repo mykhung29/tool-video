@@ -6,6 +6,7 @@ __pycache__/
 # local app state: settings, per-content projects, TTS/preview cache
 data/
 
-# workspace media (backgrounds, contents, sounds, clips, rendered videos); created on first run
-VideoMaker/
+# rendered videos stay local (they get big fast); the folder itself is kept
+VideoMaker/Output/*
+!VideoMaker/Output/.gitkeep
 *.part.mp4

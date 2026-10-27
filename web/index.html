@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Maker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">▶</span> Video Maker</div>
+  <nav class="tabs">
+    <button data-tab="contents" class="active">Content</button>
+    <button data-tab="editor">Biên tập &amp; Preview</button>
+    <button data-tab="queue">Hàng đợi <span id="queueBadge" class="badge hidden"></span></button>
+    <button data-tab="settings">Cài đặt</button>
+  </nav>
+  <div id="queueMini" class="queue-mini hidden"><div class="bar"><i></i></div><span></span></div>
+</header>
+
+<main>
+  <!-- CONTENT LIST -->
+  <section id="tab-contents" class="tab active">
+    <div class="toolbar">
+      <button id="btnRefresh" class="ghost">⟳ Làm mới</button>
+      <button id="btnSelectAll" class="ghost">Chọn tất cả</button>
+      <button id="btnSelectNone" class="ghost">Bỏ chọn</button>
+      <select id="filterStatus" class="ghost">
+        <option value="">Tất cả trạng thái</option>
+        <option value="new">Chưa dựng</option>
+        <option value="done">Đã dựng</option>
+        <option value="error">Lỗi</option>
+      </select>
+      <span class="spacer"></span>
+      <button id="btnOpenContents" class="ghost">📁 Contents</button>
+      <button id="btnOpenOutput" class="ghost">📁 Output</button>
+      <button id="btnRetryErrors" class="ghost">↻ Dựng lại video lỗi</button>
+      <button id="btnRender" class="primary" disabled>Tạo video</button>
+    </div>
+    <div id="contentsPath" class="muted small"></div>
+    <div class="table-wrap">
+      <table class="list">
+        <thead><tr>
+          <th class="w-check"><input type="checkbox" id="checkAll"></th>
+          <th>Content</th><th>Ảnh</th><th>Background</th><th>Trạng thái</th><th class="w-actions"></th>
+        </tr></thead>
+        <tbody id="contentRows"></tbody>
+      </table>
+      <div id="contentsEmpty" class="empty hidden"></div>
+    </div>
+  </section>
+
+  <!-- EDITOR -->
+  <section id="tab-editor" class="tab">
+    <div id="editorEmpty" class="empty">Chọn một content ở tab <b>Content</b> để biên tập.</div>
+    <div id="editor" class="editor hidden">
+      <div class="col images-col">
+        <div class="col-head">
+          <div>
+            <div class="title" id="edName"></div>
+            <div class="muted small" id="edInfo"></div>
+          </div>
+          <span id="saveState" class="muted small"></span>
+        </div>
+        <div id="imageList" class="image-list"></div>
+      </div>
+
+      <div class="col preview-col">
+        <div class="stage-wrap">
+          <video id="bgVideo" muted playsinline loop preload="auto"></video>
+          <canvas id="stage" width="540" height="960"></canvas>
+          <div id="stageMsg" class="stage-msg hidden"></div>
+        </div>
+        <div class="player">
+          <button id="btnPlay" class="round" title="Phát / tạm dừng">▶</button>
+          <input type="range" id="seek" min="0" max="1000" value="0">
+          <span id="timeLabel" class="mono small">0.0 / 0.0s</span>
+        </div>
+        <div id="previewStatus" class="preview-status muted small"></div>
+        <div class="preview-actions">
+          <button id="btnBuild" class="ghost hidden" title="Thử tạo lại preview">⟳ Thử lại</button>
+          <button id="btnQuickRender" class="ghost" title="Dựng file MP4 độ phân giải thấp để kiểm tra">Xuất preview nhanh</button>
+          <button id="btnRenderOne" class="ghost">Tạo video</button>
+        </div>
+        <div class="muted small center">Kéo ảnh trên khung hình để đổi vị trí ảnh đang hiển thị.</div>
+      </div>
+
+      <div class="col settings-col">
+        <div class="seg-toggle">
+          <button id="modeComment" class="active">Bình luận đang chọn</button>
+          <button id="modeVideo">Cài đặt cả video</button>
+        </div>
+        <div id="commentPanel"></div>
+        <div id="videoPanel" class="hidden">
+          <div class="group">
+            <h4>Background</h4>
+            <select id="edBg"></select>
+            <div class="row gap">
+              <button id="btnBgShuffle" class="ghost small-btn">🎲 Đổi background khác</button>
+            </div>
+            <div class="muted small" id="edBgNote"></div>
+          </div>
+          <div id="edSettings"></div>
+          <button id="btnResetAll" class="ghost small-btn">Đặt lại toàn bộ về mặc định</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUEUE -->
+  <section id="tab-queue" class="tab">
+    <div class="toolbar">
+      <button id="btnStop" class="ghost">■ Dừng hàng đợi</button>
+      <button id="btnResume" class="ghost">▶ Tiếp tục</button>
+      <button id="btnRetry" class="ghost">↻ Dựng lại video lỗi / đã huỷ</button>
+      <button id="btnClear" class="ghost">Xoá mục đã xong</button>
+      <span class="spacer"></span>
+      <button id="btnOpenOutput2" class="ghost">📁 Mở Output</button>
+    </div>
+    <div class="overall">
+      <div class="bar big"><i id="overallBar"></i></div>
+      <div id="overallText" class="muted small"></div>
+    </div>
+    <div id="jobList" class="job-list"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" class="tab">
+    <div class="settings-page">
+      <div class="card">
+        <h3>Thư mục</h3>
+        <div id="folderFields"></div>
+      </div>
+      <div class="card">
+        <h3>Xuất video</h3>
+        <div class="grid2" id="exportFields"></div>
+        <p class="muted small">Tên file hỗ trợ: <code>{name}</code> tên content, <code>{date}</code> ngày, <code>{time}</code> giờ. File trùng tên sẽ được thêm số <code>(2)</code>, không bao giờ ghi đè.</p>
+      </div>
+      <div class="card">
+        <h3>Giọng đọc (TTS)</h3>
+        <p class="muted small">Dùng Microsoft Edge TTS (miễn phí, cần Internet). Giọng đọc được lưu cache trong <code>data/cache/tts</code>, chỉ tạo lại khi nội dung, giọng hoặc tốc độ thay đổi.</p>
+        <div class="row gap">
+          <input id="ttsTestText" value="Xin chào, đây là giọng đọc thử." class="grow">
+          <button id="btnTtsTest" class="ghost">▶ Nghe thử</button>
+          <button id="btnVoicesRefresh" class="ghost">Tải lại danh sách giọng</button>
+        </div>
+      </div>
+      <div class="card wide">
+        <h3>Mặc định cho mọi video</h3>
+        <p class="muted small">Áp dụng cho các content chưa chỉnh riêng.</p>
+        <div id="defaultFields" class="defaults-grid"></div>
+      </div>
+      <div class="card wide">
+        <h3>Lịch sử background</h3>
+        <div id="bgHistory" class="small"></div>
+      </div>
+      <div class="save-row"><span id="settingsSaved" class="muted small"></span><button id="btnSaveSettings" class="primary">Lưu cài đặt</button></div>
+    </div>
+  </section>
+</main>
+
+<div id="toasts"></div>
+<audio id="voiceTest"></audio>
+<audio id="previewAudio" preload="auto"></audio>
+
+<script src="effects.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

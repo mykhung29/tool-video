@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+edge-tts>=6.1
+imageio-ffmpeg>=0.5
+pillow>=10
+numpy>=1.26
+# OCR (read comment text from images); CPU-only PyTorch keeps the download small
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+easyocr>=1.7

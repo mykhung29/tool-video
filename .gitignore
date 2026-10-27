@@ -1,0 +1,11 @@
+# Python environment (run.bat recreates it from requirements.txt)
+.venv/
+__pycache__/
+*.pyc
+
+# local app state: settings, per-content projects, TTS/preview cache
+data/
+
+# workspace media (backgrounds, contents, sounds, clips, rendered videos); created on first run
+VideoMaker/
+*.part.mp4
